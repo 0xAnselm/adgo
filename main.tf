@@ -7,18 +7,21 @@ terraform {
   }
 }
 
-provider "docker" {}
+provider "docker" {
+  host = "unix:///var/run/docker.sock"
+}
 
 resource "docker_image" "go-compiler" {
-  name         = "go:1"
+  name         = "go"
   keep_locally = true
 }
 
 resource "docker_container" "go-compiler" {
   image = docker_image.go-compiler.name
-  name  = "tutorial"
+  name  = "myGoContainer"
   #   ports {
   #     internal = 80
   #     external = 8000
   #   }
+  attach = true
 }
