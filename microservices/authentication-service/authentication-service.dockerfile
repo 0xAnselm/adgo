@@ -5,4 +5,4 @@ RUN mkdir /app
 
 COPY authApp /app
 
-CMD [ "/app/authApp" ]f
+CMD [ "/app/authApp" ]
