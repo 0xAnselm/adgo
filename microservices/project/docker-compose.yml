@@ -32,7 +32,7 @@ services:
       dockerfile: ./../time-service/time-service.dockerfile
     restart: always
     ports:
-      - "8060:80"
+      - "8082:80"
     deploy:
       mode: replicated
       replicas: 1
