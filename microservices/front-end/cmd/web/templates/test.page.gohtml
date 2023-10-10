@@ -6,7 +6,6 @@
             <div class="col">
                 <h1 class="mt-5">Test microservices</h1>
                 <hr>
-                <a id="myBtn" class="btn btn-outline-secondary" href="javascript:void(0);">My Button</a>
                 <a id="brokerBtn" class="btn btn-outline-secondary" href="javascript:void(0);">Test Broker</a>
                 <a id="authBrokerBtn" class="btn btn-outline-secondary" href="javascript:void(0);">Test Auth</a>
 
@@ -34,7 +33,6 @@
 
 {{define "js"}}
     <script>
-    let myBtn = document.getElementById("myBtn")
     let brokerBtn = document.getElementById("brokerBtn");
     let authBrokerBtn = document.getElementById("authBrokerBtn");
     let output = document.getElementById("output");
@@ -95,26 +93,5 @@
             output.innerHTML += "<br><br>Error: " + error;
         })
     })
-
-    myBtn.addEventListener("click", function () {
-            const body = {
-                method: 'POST'
-            }
-
-            fetch("http:\/\/localhost:8080/myService", body)
-                .then((response) => response.json())
-                .then((data) => {
-                    sent.innerHTML = "empty post request";
-                    received.innerHTML = JSON.stringify(data, undefined, 4);
-                    if (data.error) {
-                        console.log(data.message);
-                    } else {
-                        output.innerHTML += `<br><strong>Response from broker service</strong>: ${data.message}`;
-                    }
-                })
-                .catch((error) => {
-                    output.innerHTML += "<br><br>Error: " + error;
-                })
-        })
     </script>
 {{end}}

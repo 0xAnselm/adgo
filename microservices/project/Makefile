@@ -1,6 +1,7 @@
 FRONT_END_BINARY=frontApp
 BROKER_BINARY=brokerApp
 AUTH_BINARY=authApp
+TIME_BINARY=timeApp
 
 ## up: starts all containers in the background without forcing build
 up:
@@ -9,10 +10,10 @@ up:
 	@echo "Docker images started!"
 
 ## up_build: stops docker-compose (if running), builds all projects and starts docker compose
-up_build: build_broker build_auth
-	@echo "Stopping dokcer images (if running...)"
+up_build: build_broker build_auth build_time
+	@echo "Stopping docker images (if running...)"
 	docker-compose down
-	@echo "Buildubg (when required) and starting docker images..."
+	@echo "Building (when required) and starting docker images..."
 	docker-compose up --build -d
 	@echo "Docker images built and started!"
 
@@ -32,6 +33,12 @@ build_broker:
 build_auth:
 	@echo "Building broker binary..."
 	cd ../authentication-service && env GOOS=linux CGO_ENABLED=0 go build -o ${AUTH_BINARY} ./cmd/api
+	@echo "Done!"
+
+## build_time: builds the time binary in a linux executable
+build_time:
+	@echo "Building time binary..."
+	cd ../time-service && env GOOS=linux CGO_ENABLED=0 go build -o ${TIME_BINARY} ./cmd/api
 	@echo "Done!"
 
 ## build_front: builds the front end binary
