@@ -11,9 +11,6 @@
     },
     {
       "path": "authentication-service"
-    },
-    {
-      "path": "my-Service"
     }
   ]
 }
