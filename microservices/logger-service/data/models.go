@@ -138,7 +138,7 @@ func (l *LogEntry) Update() (*mongo.UpdateResult, error) {
 				{"data", l.Data},
 				{"updated_at", time.Now()},
 			}},
-		}
+		},
 	)
 
 	if err != nil {

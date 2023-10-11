@@ -2,7 +2,10 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"log"
+	"log-service/data"
+	"net/http"
 	"time"
 
 	"go.mongodb.org/mongo-driver/mongo"
@@ -12,13 +15,14 @@ import (
 const (
 	webPort  = "80"
 	rpcPort  = "5001"
-	mongoURL = "mongodb://mongo:27017"
+	mongoURL = "mongodb://localhost:27017"
 	gRpcPort = "5001"
 )
 
 var client *mongo.Client
 
 type Config struct {
+	Models data.Models
 }
 
 func main() {
@@ -30,7 +34,7 @@ func main() {
 
 	client = mongoClient
 
-	// create a contextt in order to disconnect
+	// create a context in order to disconnect
 	ctx, cancel := context.WithTimeout(context.Background(), 15*time.Second)
 	defer cancel()
 
@@ -40,6 +44,35 @@ func main() {
 			panic(err)
 		}
 	}()
+
+	app := Config{
+		Models: data.New(client),
+	}
+
+	// start webserver
+	// go app.serve()
+	log.Println("Starting mongo service on port", webPort)
+	srv := &http.Server{
+		Addr:    fmt.Sprintf(":%s", webPort),
+		Handler: app.routes(),
+	}
+
+	err = srv.ListenAndServe()
+	if err != nil {
+		log.Panic()
+	}
+}
+
+func (app *Config) serve() {
+	srv := &http.Server{
+		Addr:    fmt.Sprintf(":%s", webPort),
+		Handler: app.routes(),
+	}
+
+	err := srv.ListenAndServe()
+	if err != nil {
+		log.Panic()
+	}
 }
 
 func connectToMongo() (*mongo.Client, error) {
@@ -57,5 +90,6 @@ func connectToMongo() (*mongo.Client, error) {
 		return nil, err
 	}
 
+	log.Println("Connected to mongo DB")
 	return c, nil
 }
