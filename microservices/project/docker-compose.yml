@@ -13,7 +13,7 @@ services:
       mode: replicated
       replicas: 1
 
-    logger-service:
+  logger-service:
     build:
       context: ./../logger-service
       dockerfile: ./../logger-service/logger-service.dockerfile
