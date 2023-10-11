@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"errors"
+	"log"
 	"net/http"
 )
 
@@ -47,6 +48,8 @@ func (app *Config) HandleSubmission(w http.ResponseWriter, r *http.Request) {
 	}
 
 	switch requestPayload.Action {
+	case "time":
+		app.timeItem(w, requestPayload.Time)
 	case "auth":
 		app.authenticate(w, requestPayload.Auth)
 	case "log":
@@ -57,9 +60,12 @@ func (app *Config) HandleSubmission(w http.ResponseWriter, r *http.Request) {
 }
 
 func (app *Config) logItem(w http.ResponseWriter, entry LogPayload) {
+	log.Println("logItem()")
 	jsonData, _ := json.MarshalIndent(entry, "", "\t")
 
 	logServiceURL := "http://logger-service/log"
+
+	log.Println("Now here")
 
 	request, err := http.NewRequest("POST", logServiceURL, bytes.NewBuffer(jsonData))
 	if err != nil {
@@ -119,7 +125,7 @@ func (app *Config) authenticate(w http.ResponseWriter, a AuthPayload) {
 		return
 	}
 
-	// create a variable well'read response.body into
+	// create a variable we'll read response.body into
 	var jsonFromService jsonResponse
 
 	// decode json from the auth service
@@ -137,6 +143,51 @@ func (app *Config) authenticate(w http.ResponseWriter, a AuthPayload) {
 	var payload jsonResponse
 	payload.Error = false
 	payload.Message = "Authenticated!"
+	payload.Data = jsonFromService.Data
+
+	app.writeJSON(w, http.StatusAccepted, payload)
+}
+
+func (app *Config) timeItem(w http.ResponseWriter, entry TimePayload) {
+	jsonData, _ := json.MarshalIndent(entry, "", "\t")
+
+	logServiceURL := "http://time-service/time"
+
+	request, err := http.NewRequest("POST", logServiceURL, bytes.NewBuffer(jsonData))
+	if err != nil {
+		app.errorJSON(w, err)
+		return
+	}
+
+	request.Header.Set("Content-Type", "application/json")
+
+	client := &http.Client{}
+
+	response, err := client.Do(request)
+	if err != nil {
+		app.errorJSON(w, err)
+		return
+	}
+	defer response.Body.Close()
+
+	// create a variable we'll read response.Body into
+	var jsonFromService jsonResponse
+
+	// decode json from the auth service
+	err = json.NewDecoder(response.Body).Decode(&jsonFromService)
+	if err != nil {
+		app.errorJSON(w, err)
+		return
+	}
+
+	if jsonFromService.Error {
+		app.errorJSON(w, err, http.StatusInternalServerError)
+		return
+	}
+
+	var payload jsonResponse
+	payload.Error = false
+	payload.Message = "Time at adesso"
 	payload.Data = jsonFromService.Data
 
 	app.writeJSON(w, http.StatusAccepted, payload)

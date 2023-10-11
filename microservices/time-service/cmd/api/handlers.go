@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"log"
 	"math"
 	"net/http"
 	"strconv"
@@ -14,8 +13,6 @@ type myFloat struct {
 }
 
 func (app *Config) GetTime(w http.ResponseWriter, r *http.Request) {
-	log.Println("GetTime()")
-
 	c := time.Now()                // current time
 	s := time.Date(getStartDate()) // start time
 	daysE := deltaT(c, s)
@@ -24,10 +21,9 @@ func (app *Config) GetTime(w http.ResponseWriter, r *http.Request) {
 	result += " Days at adesso SE"
 
 	payload := jsonResponse{
-		Error:   false,
-		Message: fmt.Sprintf("%s", result),
+		Error: false,
+		Data:  fmt.Sprintf("%s", result),
 	}
-
 	app.writeJSON(w, http.StatusAccepted, payload)
 }
 
