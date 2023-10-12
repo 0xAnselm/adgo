@@ -8,15 +8,10 @@ import (
 	"time"
 )
 
-type myFloat struct {
-	f float64
-}
-
 func (app *Config) GetTime(w http.ResponseWriter, r *http.Request) {
-	c := time.Now()                // current time
-	s := time.Date(getStartDate()) // start time
-	daysE := deltaT(c, s)
-	result := daysE.toString() // result
+	c := time.Now()                                          // current time
+	s := time.Date(getStartDate())                           // start time
+	result := strconv.FormatFloat(deltaT(c, s), 'g', -1, 64) // result as string
 
 	result += " Days at adesso SE"
 
@@ -27,15 +22,10 @@ func (app *Config) GetTime(w http.ResponseWriter, r *http.Request) {
 	app.writeJSON(w, http.StatusAccepted, payload)
 }
 
-func deltaT(c time.Time, s time.Time) myFloat {
+func deltaT(c time.Time, s time.Time) float64 {
 	d := c.Sub(s)       // delta time
 	r := d.Hours() / 24 // time in days
-	mf := myFloat{math.Floor(r)}
-	return mf
-}
-
-func (f myFloat) toString() string {
-	return strconv.FormatFloat(f.f, 'f', -1, 64)
+	return math.Round(r*100) / 100
 }
 
 func getStartDate() (int, time.Month, int, int, int, int, int, *time.Location) {

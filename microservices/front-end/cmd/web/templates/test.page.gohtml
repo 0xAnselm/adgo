@@ -6,10 +6,11 @@
             <div class="col">
                 <h1 class="mt-5">Test microservices</h1>
                 <hr>
-                <a id="timeBtn" class="btn btn-outline-secondary" href="javascript:void(0);">Test Time</a>
                 <a id="brokerBtn" class="btn btn-outline-secondary" href="javascript:void(0);">Test Broker</a>
+                <a id="timeBtn" class="btn btn-outline-secondary" href="javascript:void(0);">Test Time</a>
                 <a id="authBrokerBtn" class="btn btn-outline-secondary" href="javascript:void(0);">Test Auth</a>
                 <a id="logBtn" class="btn btn-outline-secondary" href="javascript:void(0);">Test Log</a>
+                <a id="failBtn" class="btn btn-outline-secondary" href="javascript:void(0);">Failed successfully</a>
 
                 <div id="output" class="mt-5" style="outline: 1px solid silver; padding: 2em;">
                     <span class="text-muted">Output<span>
@@ -39,6 +40,7 @@
     let brokerBtn = document.getElementById("brokerBtn");
     let authBrokerBtn = document.getElementById("authBrokerBtn");
     let logBtn = document.getElementById("logBtn");
+    let failBtn = document.getElementById("failBtn");
     let output = document.getElementById("output");
     let sent = document.getElementById("payload");
     let received = document.getElementById("received");
@@ -101,9 +103,6 @@
     timeBtn.addEventListener("click", function () {
         const payload = {
             action: "time",
-            time: {
-                data: "abc",
-            }
         }
 
         const headers = new Headers();
@@ -118,7 +117,7 @@
         fetch("http:\/\/localhost:8080/handle", body)
             .then((response) => response.json())
             .then((data) => {
-                sent.innerHTML = "empty get request";
+                sent.innerHTML = JSON.stringify(payload, undefined, 4);
                 received.innerHTML = JSON.stringify(data, undefined, 4);
                 if (data.error) {
                     console.log(data.message);
@@ -165,5 +164,31 @@
             })
     })
 
+    failBtn.addEventListener("click", function () {
+        const payload = {
+            action: "about to error",
+            message: "request should fail :3"
+        }
+
+        const body = {
+            method: 'POST',
+            body: JSON.stringify(payload),
+        }
+
+        fetch("http:\/\/localhost:8080/handle", body)
+            .then((response) => response.json())
+            .then((data) => {
+                sent.innerHTML = JSON.stringify(payload, undefined, 4);
+                received.innerHTML = JSON.stringify(data, undefined, 4);
+                if (data.error) {
+                    console.log(data.message);
+                } else {
+                    output.innerHTML += `<br><strong>Response from broker service</strong>: ${data.message}`;
+                }
+            })
+            .catch((error) => {
+                output.innerHTML += "<br><br>Error: " + error;
+            })
+    })
     </script>
 {{end}}

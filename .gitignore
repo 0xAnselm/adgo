@@ -3,3 +3,4 @@ terraform.*
 .terraform.*
 .DS_Store
 microservices/project/db-data/*
+microservices/project/db/data/*
