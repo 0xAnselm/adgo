@@ -169,10 +169,6 @@
     fruitsBtn.addEventListener("click", function () {
         const payload = {
             action: "fruits",
-            fruits: {
-                name: "pear",
-                color: "green"
-            }
         }
 
         const headers = new Headers();
@@ -192,7 +188,7 @@
                 if (data.error) {
                     output.innerHTML += `<br><strong>Error:</strong> ${data.message}`;
                 } else {
-                    output.innerHTML += `<br><strong>Response from broker service</strong>: ${data.message}`;
+                    output.innerHTML += `<br><strong>Response from fruits service</strong>: 🍓`;
                 }
             })
             .catch((error) => {

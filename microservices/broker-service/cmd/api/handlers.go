@@ -202,18 +202,26 @@ func (app *Config) timeItem(w http.ResponseWriter, entry TimePayload) {
 }
 
 func (app *Config) fruits(w http.ResponseWriter, f FruitsPayload) {
-	jsonData, _ := json.MarshalIndent(f, "", "\t")
+
 	pythonAPIURL := "http://fruits-service/fruits"
 
 	// Make a POST request to retrieve the fruit data
-	response, err := http.NewRequest("POST", pythonAPIURL, bytes.NewBuffer(jsonData))
+	response, err := http.Get(pythonAPIURL)
 	if err != nil {
 		app.errorJSON(w, err)
+		log.Println("Service not reachable")
 		return
 	}
 	defer response.Body.Close()
 
-	log.Println(response.Body)
+	// Check the response status code
+	// if response.StatusCode != http.StatusOK {
+	// 	app.errorJSON(w, errors.New("Service returned a non-successful status"))
+	// 	log.Println("Service not reachable")
+	// 	return
+	// }
+
+	log.Println("Fruits response")
 
 	// Read and parse the response
 	var payload []FruitsPayload // Create a struct to unmarshal the JSON response
