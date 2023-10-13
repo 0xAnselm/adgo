@@ -46,6 +46,17 @@ services:
       mode: replicated
       replicas: 1
 
+  fruits-service:
+    build:
+      context: ./../fruits-service
+      dockerfile: ./../fruits-service/fruits-service.dockerfile
+    restart: always
+    ports:
+      - "8083:5000"
+    deploy:
+      mode: replicated
+      replicas: 1
+
   postgres:
     image: 'postgres:14.2'
     ports:
