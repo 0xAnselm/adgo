@@ -45,7 +45,7 @@ func (app *Config) Broker(w http.ResponseWriter, r *http.Request) {
 }
 
 func (app *Config) HandleSubmission(w http.ResponseWriter, r *http.Request) {
-	log.Panic("Broker.HandleSubmission")
+	log.Println("Broker.HandleSubmission")
 
 	var requestPayload RequestPayload
 
@@ -57,14 +57,12 @@ func (app *Config) HandleSubmission(w http.ResponseWriter, r *http.Request) {
 
 	switch requestPayload.Action {
 	case "time":
-		log.Println("Case: Fruits")
 		app.timeItem(w, requestPayload.Time)
 	case "auth":
 		app.authenticate(w, requestPayload.Auth)
 	case "log":
 		app.logItem(w, requestPayload.Log)
 	case "fruits":
-		log.Println("Case: Fruits")
 		app.fruits(w, requestPayload.Fruits)
 	default:
 		app.errorJSON(w, errors.New("unknown action"))
@@ -204,17 +202,18 @@ func (app *Config) timeItem(w http.ResponseWriter, entry TimePayload) {
 }
 
 func (app *Config) fruits(w http.ResponseWriter, f FruitsPayload) {
-	// jsonData, _ := json.MarshalIndent(f, "", "\t")
-	log.Println("\n\nhit fuits")
-	pythonAPIURL := "http://fruits-service/"
+	jsonData, _ := json.MarshalIndent(f, "", "\t")
+	pythonAPIURL := "http://fruits-service/fruits"
 
-	// Make a GET request to retrieve the fruit data
-	response, err := http.Get(pythonAPIURL)
+	// Make a POST request to retrieve the fruit data
+	response, err := http.NewRequest("POST", pythonAPIURL, bytes.NewBuffer(jsonData))
 	if err != nil {
 		app.errorJSON(w, err)
 		return
 	}
 	defer response.Body.Close()
+
+	log.Println(response.Body)
 
 	// Read and parse the response
 	var payload []FruitsPayload // Create a struct to unmarshal the JSON response

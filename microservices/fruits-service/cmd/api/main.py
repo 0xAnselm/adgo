@@ -18,7 +18,7 @@ def get_value(key):
         return "Key not found", 404
 
 
-@app.route('/fruits', methods=['GET'])
+@app.route('/fruits', methods=['GET', 'POST'])
 def get_values():
     logging.info("/fruits")
     for k, v in data.items():
