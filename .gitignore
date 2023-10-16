@@ -5,3 +5,5 @@ terraform.*
 microservices/project/db-data/*
 microservices/project/db/data/*
 microservices/fruits-service/cmd/api/venv/*
+microservices/fruits-service/venv/*
+microservices/fruits-service/cmd/fruitsAPI.egg-info/*
