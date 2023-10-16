@@ -29,7 +29,7 @@ def get_fruit(name):
     for fruit in fruits_db.data:
         if name == fruit['name']:
             return fruit
-    return "Fruit not found"
+    return jsonify({'message': f'Fruit {name} not found'}), 404
 
 
 @my_routes.route('/fruits/<name>', methods=['DELETE'])
@@ -45,4 +45,7 @@ def delete_fruit(name):
 @my_routes.route('/ping', methods=['GET'])
 @my_routes.route('/<num>', methods=['GET'])
 def welcome(num=None):
-    return "Welcome " + str(num) if num is not None else "Welcome"
+    if num:
+        return jsonify({'message': f'Welcome {num}'})
+    else:
+        return jsonify({'message': 'Welcome'})
