@@ -1,5 +1,8 @@
-data = [
-    {'name': 'apple', 'color': 'red', 'weight': 133},
-    {'name': 'banana', 'color': 'yellow', 'weight': 118},
-    {'name': 'cherry', 'color': 'red', 'weight': 12}
-]
+from flask_pymongo import PyMongo
+
+mongo = PyMongo()
+
+
+def connectDB(app):
+    app.config['MONGO_URI'] = "mongodb://admin:password@localhost:27018/db_name?authSource=admin"
+    mongo.init_app(app)

@@ -58,6 +58,20 @@ services:
     ports:
       - "8083:80"
     restart: always
+
+  mongo-fruits:
+    image: 'mongo:4.2.16-bionic'
+    ports:
+      - "27018:27017"
+    deploy:
+      mode: replicated
+      replicas: 1
+    environment:
+      - MONGO_INITDB_DATABASE=fruitsDB
+      - MONGO_INITDB_ROOT_USERNAME=admin
+      - MONGO_INITDB_ROOT_PASSWORD=password
+    volumes:
+      - ./db-data/mongo-fruits/:/data/db
   # postgres:
   #   image: 'postgres:14.2'
   #   ports:
