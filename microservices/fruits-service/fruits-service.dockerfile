@@ -6,9 +6,11 @@ COPY requirements.txt .
 
 RUN pip install --no-cache-dir -r requirements.txt
 
-COPY cmd/api/ .
+COPY cmd/ .
 
-EXPOSE 5000
+EXPOSE 80
+
+RUN pip install -e .
 
 # Define the command to run your application
-CMD ["python", "main.py"]
+CMD ["python", "fruitsAPI/__init__.py"]>>
