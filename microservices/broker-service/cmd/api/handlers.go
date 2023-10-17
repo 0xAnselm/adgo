@@ -9,10 +9,11 @@ import (
 )
 
 type RequestPayload struct {
-	Action string      `json:"action"`
-	Auth   AuthPayload `json:"auth,omitempty"`
-	Time   TimePayload `json:"time,omitempty"`
-	Log    LogPayload  `json:"log,omitempty"`
+	Action string        `json:"action"`
+	Auth   AuthPayload   `json:"auth,omitempty"`
+	Time   TimePayload   `json:"time,omitempty"`
+	Log    LogPayload    `json:"log,omitempty"`
+	Fruits FruitsPayload `json:"fruits,omitempty"`
 }
 
 type AuthPayload struct {
@@ -29,6 +30,11 @@ type LogPayload struct {
 	Data string `json:"data"`
 }
 
+type FruitsPayload struct {
+	Name  string `json:"name"`
+	Color string `json:"color"`
+}
+
 func (app *Config) Broker(w http.ResponseWriter, r *http.Request) {
 	payload := jsonResponse{
 		Error:   false,
@@ -39,6 +45,8 @@ func (app *Config) Broker(w http.ResponseWriter, r *http.Request) {
 }
 
 func (app *Config) HandleSubmission(w http.ResponseWriter, r *http.Request) {
+	log.Println("Broker.HandleSubmission")
+
 	var requestPayload RequestPayload
 
 	err := app.readJSON(w, r, &requestPayload)
@@ -54,19 +62,19 @@ func (app *Config) HandleSubmission(w http.ResponseWriter, r *http.Request) {
 		app.authenticate(w, requestPayload.Auth)
 	case "log":
 		app.logItem(w, requestPayload.Log)
+	case "fruits":
+		app.fruits(w, requestPayload.Fruits)
 	default:
 		app.errorJSON(w, errors.New("unknown action"))
 	}
 }
 
 func (app *Config) logItem(w http.ResponseWriter, entry LogPayload) {
-	log.Println("logItem()")
 	jsonData, _ := json.MarshalIndent(entry, "", "\t")
 
 	logServiceURL := "http://logger-service/log"
 
-	log.Println("Now here")
-
+	// Make a GET request to retrieve the fruit data
 	request, err := http.NewRequest("POST", logServiceURL, bytes.NewBuffer(jsonData))
 	if err != nil {
 		app.errorJSON(w, err)
@@ -190,5 +198,38 @@ func (app *Config) timeItem(w http.ResponseWriter, entry TimePayload) {
 	payload.Message = "Time at adesso"
 	payload.Data = jsonFromService.Data
 
+	app.writeJSON(w, http.StatusAccepted, payload)
+}
+
+func (app *Config) fruits(w http.ResponseWriter, f FruitsPayload) {
+
+	pythonAPIURL := "http://fruits-service/fruits"
+
+	// Make a POST request to retrieve the fruit data
+	response, err := http.Get(pythonAPIURL)
+	if err != nil {
+		app.errorJSON(w, err)
+		log.Println("Service not reachable")
+		return
+	}
+	defer response.Body.Close()
+
+	// Check the response status code
+	// if response.StatusCode != http.StatusOK {
+	// 	app.errorJSON(w, errors.New("Service returned a non-successful status"))
+	// 	log.Println("Service not reachable")
+	// 	return
+	// }
+
+	log.Println("Fruits response")
+
+	// Read and parse the response
+	var payload []FruitsPayload // Create a struct to unmarshal the JSON response
+	if err := json.NewDecoder(response.Body).Decode(&payload); err != nil {
+		app.errorJSON(w, err)
+		return
+	}
+
+	// Respond with the fruit data
 	app.writeJSON(w, http.StatusAccepted, payload)
 }

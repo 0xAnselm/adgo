@@ -20,6 +20,15 @@
     },
     {
       "path": "listener-service"
+    },
+    {
+      "path": "fruits-service"
     }
-  ]
+  ],
+  "settings": {
+    "[python]": {
+      "editor.defaultFormatter": "ms-python.autopep8"
+    },
+    "python.formatting.provider": "none"
+  }
 }

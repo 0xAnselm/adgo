@@ -117,8 +117,7 @@ func logEvent(entry Payload) error {
 
 	request, err := http.NewRequest("POST", logServiceURL, bytes.NewBuffer(jsonData))
 	if err != nil {
-		app.errorJSON(w, err)
-		return
+		return err
 	}
 
 	request.Header.Set("Content-Type", "application/json")
@@ -127,19 +126,13 @@ func logEvent(entry Payload) error {
 
 	response, err := client.Do(request)
 	if err != nil {
-		app.errorJSON(w, err)
-		return
+		return err
 	}
 	defer response.Body.Close()
 
 	if response.StatusCode != http.StatusAccepted {
-		app.errorJSON(w, err)
-		return
+		return err
 	}
 
-	var payload jsonResponse
-	payload.Error = false
-	payload.Message = "logged"
-
-	app.writeJSON(w, http.StatusAccepted, payload)
+	return nil
 }

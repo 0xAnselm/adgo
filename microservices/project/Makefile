@@ -11,7 +11,7 @@ up:
 	@echo "Docker images started!"
 
 ## up_build: stops docker-compose (if running), builds all projects and starts docker compose
-up_build: build_broker build_auth build_time build_logger
+up_build: build_broker build_auth build_time build_logger build_fruits
 	@echo "Stopping docker images (if running...)"
 	docker-compose down
 	@echo "Building (when required) and starting docker images..."
@@ -52,6 +52,11 @@ build_time:
 build_front:
 	@echo "Building front end binary..."
 	cd ../front-end && env CGO_ENABLED=0 go build -o ${FRONT_END_BINARY} ./cmd/web
+	@echo "Done!"
+
+## build_fruits: builds the fruit file
+build_fruits:
+	@echo "Building fruit stub..."
 	@echo "Done!"
 
 ## start: starts the front end

@@ -4,5 +4,9 @@ terraform.*
 .DS_Store
 microservices/project/db-data/*
 microservices/project/db/data/*
+<<<<<<< HEAD
+=======
+microservices/fruits-service/cmd/api/venv/*
+>>>>>>> fruits
 microservices/fruits-service/venv/*
 microservices/fruits-service/cmd/fruitsAPI.egg-info/*
