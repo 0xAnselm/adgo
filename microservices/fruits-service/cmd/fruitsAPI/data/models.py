@@ -1,5 +1,5 @@
 class Fruit:
-    def __init__(self, _id, name, color, weight):
+    def __init__(self, name, color, weight, _id=None):
         self._id = _id
         self.name = name
         self.color = color
