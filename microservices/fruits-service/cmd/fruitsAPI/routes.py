@@ -1,7 +1,5 @@
 from flask import jsonify, Blueprint, request
 from logger import configure_logger
-from bson.json_util import dumps
-from data.models import Fruit
 import data.db as fruits_db
 
 my_routes = Blueprint("my_routes", __name__)

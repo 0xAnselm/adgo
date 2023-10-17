@@ -31,8 +31,14 @@ type LogPayload struct {
 }
 
 type FruitsPayload struct {
-	Name  string `json:"name"`
-	Color string `json:"color"`
+	Name   string `json:"name"`
+	Color  string `json:"color"`
+	Weight int    `json:"weight"`
+}
+
+type GenerealResponse struct {
+	Key1 string `json:"key1"`
+	Key2 int    `json:"key2"`
 }
 
 func (app *Config) Broker(w http.ResponseWriter, r *http.Request) {
@@ -203,7 +209,7 @@ func (app *Config) timeItem(w http.ResponseWriter, entry TimePayload) {
 
 func (app *Config) fruits(w http.ResponseWriter, f FruitsPayload) {
 
-	pythonAPIURL := "http://fruits-service/fruits"
+	pythonAPIURL := "http://fruits-service:90/"
 
 	// Make a POST request to retrieve the fruit data
 	response, err := http.Get(pythonAPIURL)
@@ -214,22 +220,21 @@ func (app *Config) fruits(w http.ResponseWriter, f FruitsPayload) {
 	}
 	defer response.Body.Close()
 
-	// Check the response status code
-	// if response.StatusCode != http.StatusOK {
-	// 	app.errorJSON(w, errors.New("Service returned a non-successful status"))
-	// 	log.Println("Service not reachable")
-	// 	return
-	// }
+	var data RequestPayload
 
-	log.Println("Fruits response")
-
-	// Read and parse the response
-	var payload []FruitsPayload // Create a struct to unmarshal the JSON response
-	if err := json.NewDecoder(response.Body).Decode(&payload); err != nil {
-		app.errorJSON(w, err)
-		return
+	// Parse the JSON response
+	decoder := json.NewDecoder(response.Body)
+	if err := decoder.Decode(&data); err != nil {
+		log.Fatal(err)
 	}
 
-	// Respond with the fruit data
-	app.writeJSON(w, http.StatusAccepted, payload)
+	// var payload []FruitsPayload
+
+	// if err := json.NewDecoder(response.Body).Decode(&payload); err != nil {
+	// 	app.errorJSON(w, err)
+	// 	return
+	// }
+	// log.Println("Fruits response", payload)
+
+	app.writeJSON(w, http.StatusAccepted, data)
 }

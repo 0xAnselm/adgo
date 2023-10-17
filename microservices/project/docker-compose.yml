@@ -56,7 +56,7 @@ services:
     networks:
       default: null
     ports:
-      - "8083:80"
+      - "8083:90"
     restart: always
 
   mongo-fruits:
