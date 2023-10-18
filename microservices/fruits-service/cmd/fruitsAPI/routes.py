@@ -8,7 +8,7 @@ logger = configure_logger()  # Initialize the logger
 
 @my_routes.route('/fruits', methods=['GET'])  # Get all fruits
 def get_fruits():
-    return fruits_db.find_all()
+    return fruits_db.find_all(), 200
 
 
 @my_routes.route('/fruits', methods=['POST'])  # Add a fruit

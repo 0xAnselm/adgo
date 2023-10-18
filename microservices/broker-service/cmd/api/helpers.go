@@ -82,3 +82,94 @@ func (app *Config) printJSON(f any) {
 
 	log.Println("JSON:", prettyJSON.String())
 }
+
+func (app *Config) fruitsGET(w http.ResponseWriter, f FruitsPayload) {
+	pythonAPIURL := "http://fruits-service:90/fruits"
+
+	var response *http.Response
+	var err error
+
+	log.Println("\tCase: GET")
+	log.Println("\tMethod:", f.Method)
+	log.Println("\tData:", f.Path)
+	// Make a GET request to retrieve the fruit data
+	response, err = http.Get(pythonAPIURL)
+
+	if err != nil {
+		app.errorJSON(w, err)
+		log.Println("Service not reachable")
+		return
+	}
+	defer response.Body.Close()
+
+	// create a variable we'll read response.Body into
+	var jsonFromService jsonResponse
+
+	// decode json from the auth service
+	err = json.NewDecoder(response.Body).Decode(&jsonFromService)
+	if err != nil {
+		app.errorJSON(w, err)
+		return
+	}
+
+	if jsonFromService.Error {
+		app.errorJSON(w, err, http.StatusInternalServerError)
+		return
+	}
+
+	var payload jsonResponse
+	payload.Error = false
+	payload.Message = "fruits"
+	payload.Data = jsonFromService.Data
+
+	app.writeJSON(w, http.StatusAccepted, payload)
+}
+
+func (app *Config) fruitPOST(w http.ResponseWriter, f FruitsPayload) {
+	jsonData, _ := json.MarshalIndent(f, "", "\t")
+
+	pythonAPIURL := "http://fruits-service:90/fruits"
+
+	log.Println("\tCase: POST")
+	log.Println("\tMethod:", f.Method)
+	log.Println("\tData:", f.Path)
+	// Make a GET request to retrieve the fruit data
+	request, err := http.NewRequest("POST", pythonAPIURL, bytes.NewBuffer(jsonData))
+	if err != nil {
+		app.errorJSON(w, err)
+		return
+	}
+
+	request.Header.Set("Content-Type", "application/json")
+
+	client := &http.Client{}
+
+	response, err := client.Do(request)
+	if err != nil {
+		app.errorJSON(w, err)
+		return
+	}
+	defer response.Body.Close()
+
+	// create a variable we'll read response.Body into
+	var jsonFromService jsonResponse
+
+	// decode json from the auth service
+	err = json.NewDecoder(response.Body).Decode(&jsonFromService)
+	if err != nil {
+		app.errorJSON(w, err)
+		return
+	}
+
+	if jsonFromService.Error {
+		app.errorJSON(w, err, http.StatusInternalServerError)
+		return
+	}
+
+	var payload jsonResponse
+	payload.Error = false
+	payload.Data = jsonFromService.Message
+	payload.Data = jsonFromService.Data
+
+	app.writeJSON(w, http.StatusAccepted, payload)
+}

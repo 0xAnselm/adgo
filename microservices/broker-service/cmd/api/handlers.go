@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"encoding/json"
 	"errors"
-	"fmt"
 	"log"
 	"net/http"
 )
@@ -196,43 +195,18 @@ func (app *Config) timeItem(w http.ResponseWriter, entry TimePayload) {
 
 	var payload jsonResponse
 	payload.Error = false
-	payload.Message = "Time at adesso"
+	payload.Data = jsonFromService.Message
 	payload.Data = jsonFromService.Data
 
 	app.writeJSON(w, http.StatusAccepted, payload)
 }
 
 func (app *Config) fruits(w http.ResponseWriter, f FruitsPayload) {
-	pythonAPIURL := "http://fruits-service:90/"
-
-	// At this point, 'f' contains the unmarshaled JSON data
-	fmt.Printf("Method: %s, Path: %s\n", f.Method, f.Path)
 
 	switch f.Method {
-	default:
-		log.Println("\tCase: GET")
-		log.Println("\tMethod:", f.Method)
-		log.Println("\tData:", f.Path)
-		// Make a POST request to retrieve the fruit data
-		response, err := http.Get(pythonAPIURL)
-
-		if err != nil {
-			app.errorJSON(w, err)
-			log.Println("Service not reachable")
-			return
-		}
-		if response.Body != nil {
-			defer response.Body.Close()
-		}
-
-		var data RequestPayload
-
-		// Parse the JSON response
-		decoder := json.NewDecoder(response.Body)
-		if err := decoder.Decode(&data); err != nil {
-			log.Fatal(err)
-		}
-
-		app.writeJSON(w, http.StatusAccepted, data)
+	case "GET":
+		app.fruitsGET(w, f)
+	case "POST":
+		app.fruitPOST(w, f)
 	}
 }

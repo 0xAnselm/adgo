@@ -16,7 +16,23 @@ def find_all():
     d = []
     for r in result:
         d.append(Fruit(**r).to_json())
-    return jsonify(d)
+
+    if len(d) > 0:
+        # Data is not empty
+        response = {
+            "error": False,
+            "message": "Success",
+            "data": d
+        }
+    else:
+        # Data is empty
+        response = {
+            "error": True,
+            "message": "No data found",
+            "data": []
+        }
+
+    return jsonify(response)
 
 
 def add_fruit(data: any):
@@ -30,7 +46,12 @@ def add_fruit(data: any):
 
 def get_fruit(name: str):
     fruit = mongo.db.fruits.find_one_or_404({'name': name})
-    return Fruit(**fruit).to_json()
+    response = {
+        "error": "false",
+        "message": "Success",
+        "data": Fruit(**fruit).to_json()
+    }
+    return jsonify(response)
 
 
 def delete_fruit(name: str):
@@ -38,9 +59,20 @@ def delete_fruit(name: str):
 
     if fruit is None:
         logger.info(f'Fruit {name} not found')
-        return jsonify({'message': f'Fruit {name} not found'}), 404
+
+        response = {
+            "error": "true",
+            "message": f"Fruit {name} found",
+        }
+
+        return jsonify(response), 404
 
     mongo.db.fruits.delete_one({'name': name})
 
     logger.info(f'Fruit {name} deleted')
+
+    response = {
+        "error": "false",
+        "message": f"Fruit {name} deleted",
+    }
     return jsonify({'message': f'Fruit {name} deleted'}), 200

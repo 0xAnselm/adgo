@@ -16,8 +16,9 @@ func (app *Config) GetTime(w http.ResponseWriter, r *http.Request) {
 	result += " Days at adesso SE"
 
 	payload := jsonResponse{
-		Error: false,
-		Data:  fmt.Sprintf("%s", result),
+		Error:   false,
+		Message: "Time at adesso",
+		Data:    fmt.Sprintf("%s", result),
 	}
 	app.writeJSON(w, http.StatusAccepted, payload)
 }
