@@ -1,9 +1,11 @@
 package main
 
 import (
+	"bytes"
 	"encoding/json"
 	"errors"
 	"io"
+	"log"
 	"net/http"
 )
 
@@ -66,4 +68,17 @@ func (app *Config) errorJSON(w http.ResponseWriter, err error, status ...int) er
 	payload.Message = err.Error()
 
 	return app.writeJSON(w, statusCode, payload)
+}
+
+func (app *Config) printJSON(f any) {
+	jsonData, _ := json.MarshalIndent(f, "", "\t")
+
+	var prettyJSON bytes.Buffer
+	error := json.Indent(&prettyJSON, jsonData, "", "\t")
+	if error != nil {
+		log.Println("JSON parse error: ", error)
+		return
+	}
+
+	log.Println("JSON:", prettyJSON.String())
 }

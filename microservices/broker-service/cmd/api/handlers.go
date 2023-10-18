@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"log"
 	"net/http"
 )
@@ -13,7 +14,7 @@ type RequestPayload struct {
 	Auth   AuthPayload   `json:"auth,omitempty"`
 	Time   TimePayload   `json:"time,omitempty"`
 	Log    LogPayload    `json:"log,omitempty"`
-	Fruits FruitsPayload `json:"fruits,omitempty"`
+	Fruits FruitsPayload `json:"data,omitempty"`
 }
 
 type AuthPayload struct {
@@ -31,14 +32,8 @@ type LogPayload struct {
 }
 
 type FruitsPayload struct {
-	Name   string `json:"name"`
-	Color  string `json:"color"`
-	Weight int    `json:"weight"`
-}
-
-type GenerealResponse struct {
-	Key1 string `json:"key1"`
-	Key2 int    `json:"key2"`
+	Method string `json:"method"`
+	Path   string `json:"path"`
 }
 
 func (app *Config) Broker(w http.ResponseWriter, r *http.Request) {
@@ -208,33 +203,36 @@ func (app *Config) timeItem(w http.ResponseWriter, entry TimePayload) {
 }
 
 func (app *Config) fruits(w http.ResponseWriter, f FruitsPayload) {
-
 	pythonAPIURL := "http://fruits-service:90/"
 
-	// Make a POST request to retrieve the fruit data
-	response, err := http.Get(pythonAPIURL)
-	if err != nil {
-		app.errorJSON(w, err)
-		log.Println("Service not reachable")
-		return
+	// At this point, 'f' contains the unmarshaled JSON data
+	fmt.Printf("Method: %s, Path: %s\n", f.Method, f.Path)
+
+	switch f.Method {
+	default:
+		log.Println("\tCase: GET")
+		log.Println("\tMethod:", f.Method)
+		log.Println("\tData:", f.Path)
+		// Make a POST request to retrieve the fruit data
+		response, err := http.Get(pythonAPIURL)
+
+		if err != nil {
+			app.errorJSON(w, err)
+			log.Println("Service not reachable")
+			return
+		}
+		if response.Body != nil {
+			defer response.Body.Close()
+		}
+
+		var data RequestPayload
+
+		// Parse the JSON response
+		decoder := json.NewDecoder(response.Body)
+		if err := decoder.Decode(&data); err != nil {
+			log.Fatal(err)
+		}
+
+		app.writeJSON(w, http.StatusAccepted, data)
 	}
-	defer response.Body.Close()
-
-	var data RequestPayload
-
-	// Parse the JSON response
-	decoder := json.NewDecoder(response.Body)
-	if err := decoder.Decode(&data); err != nil {
-		log.Fatal(err)
-	}
-
-	// var payload []FruitsPayload
-
-	// if err := json.NewDecoder(response.Body).Decode(&payload); err != nil {
-	// 	app.errorJSON(w, err)
-	// 	return
-	// }
-	// log.Println("Fruits response", payload)
-
-	app.writeJSON(w, http.StatusAccepted, data)
 }
