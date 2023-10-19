@@ -195,7 +195,7 @@ func (app *Config) timeItem(w http.ResponseWriter, entry TimePayload) {
 
 	var payload jsonResponse
 	payload.Error = false
-	payload.Data = jsonFromService.Message
+	payload.Message = jsonFromService.Message
 	payload.Data = jsonFromService.Data
 
 	app.writeJSON(w, http.StatusAccepted, payload)
