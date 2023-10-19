@@ -39,9 +39,17 @@ def add_fruit(data: any):
     if 'name' in data and 'color' in data and 'weight' in data:
         new_fruit = Fruit(data['name'], data['color'], data['weight'])
         mongo.db.fruits.insert_one(new_fruit.to_json())
-        return jsonify({'message': 'Fruit added successfully'}), 201
+        response = {
+            "error": False,
+            "message": "Fruit added",
+        }
+        return jsonify(response), 201
     else:
-        return jsonify({'error': 'Invalid data. Name, color, and weight are required.'}), 400
+        response = {
+            "Error": True,
+            "Message": f"Fruit not added",
+        }
+        return jsonify(response), 400
 
 
 def get_fruit(name: str):

@@ -31,8 +31,15 @@ type LogPayload struct {
 }
 
 type FruitsPayload struct {
-	Method string `json:"method"`
-	Path   string `json:"path"`
+	Method string      `json:"method"`
+	Path   string      `json:"path"`
+	Body   BodyPayload `json:"body"`
+}
+
+type BodyPayload struct {
+	Name   string `json:"name"`
+	Color  string `json:"color"`
+	Weight string `json:"weight"`
 }
 
 func (app *Config) Broker(w http.ResponseWriter, r *http.Request) {
@@ -208,5 +215,7 @@ func (app *Config) fruits(w http.ResponseWriter, f FruitsPayload) {
 		app.fruitsGET(w, f)
 	case "POST":
 		app.fruitPOST(w, f)
+	case "DELETE":
+		app.fruitDELETE(w, f)
 	}
 }

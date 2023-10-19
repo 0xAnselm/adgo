@@ -14,7 +14,6 @@
                 <a id="failBtn" class="btn btn-outline-secondary" href="javascript:void(0);">Failed successfully</a>
                 <h6 class="mt-2">Fruits Service</h6>
                 <a id="mngBtnGet" class="btn btn-outline-secondary" href="javascript:void(0);">Mongo GET</a>
-                <a id="mngBtnPut" class="btn btn-outline-secondary" href="javascript:void(0);">Mongo PUT</a>
                 <a id="mngBtnPost" class="btn btn-outline-secondary" href="javascript:void(0);">Mongo POST</a>
                 <a id="mngBtnDel" class="btn btn-outline-secondary" href="javascript:void(0);">Mongo DEL</a>
 
@@ -201,10 +200,37 @@ fruitsBtn.addEventListener("click", function () {
         })
 })
 
-mngBtnGet.addEventListener("click", function(){
+failBtn.addEventListener("click", function () {
+    const payload = {
+        action: "about to error",
+        message: "request should fail :3"
+    }
+
+    const body = {
+        method: 'POST',
+        body: JSON.stringify(payload),
+    }
+
+    fetch("http:\/\/localhost:8080/handle", body)
+        .then((response) => response.json())
+        .then((data) => {
+            sent.innerHTML = JSON.stringify(payload, undefined, 4);
+            received.innerHTML = JSON.stringify(data, undefined, 4);
+            if (data.error) {
+                console.log(data.message);
+            } else {
+                output.innerHTML += `<br><strong>Response from broker service</strong>: ${data.message}`;
+            }
+        })
+        .catch((error) => {
+            output.innerHTML += "<br><br>Error: " + error;
+        })
+})
+
+mngBtnGet.addEventListener("click", function () {
     const headers = new Headers();
     headers.append("Content-Type", "application/json");
-    
+
     const payload = {
         action: 'fruits',
         data: {
@@ -235,33 +261,6 @@ mngBtnGet.addEventListener("click", function(){
         })
 })
 
-failBtn.addEventListener("click", function () {
-    const payload = {
-        action: "about to error",
-        message: "request should fail :3"
-    }
-
-    const body = {
-        method: 'POST',
-        body: JSON.stringify(payload),
-    }
-
-    fetch("http:\/\/localhost:8080/handle", body)
-        .then((response) => response.json())
-        .then((data) => {
-            sent.innerHTML = JSON.stringify(payload, undefined, 4);
-            received.innerHTML = JSON.stringify(data, undefined, 4);
-            if (data.error) {
-                console.log(data.message);
-            } else {
-                output.innerHTML += `<br><strong>Response from broker service</strong>: ${data.message}`;
-            }
-        })
-        .catch((error) => {
-            output.innerHTML += "<br><br>Error: " + error;
-        })
-})
-
 mngBtnPost.addEventListener("click", function() {
     const headers = new Headers();
     headers.append("Content-Type", "application/json");
@@ -270,7 +269,12 @@ mngBtnPost.addEventListener("click", function() {
         action: 'fruits',
         data: {
             method: "POST",
-            path: "fruits"
+            path: "fruits",
+            body: {
+                "name": "pineapple", 
+                "color": "green", 
+                "weight": "1170"
+            }
         }
     }
 
@@ -294,6 +298,40 @@ mngBtnPost.addEventListener("click", function() {
         .catch((error) => {
             output.innerHTML += "<br><br>Error: " + error;
         })   
+})
+
+mngBtnDel.addEventListener("click", function () {
+    const headers = new Headers();
+    headers.append("Content-Type", "application/json");
+
+    const payload = {
+        action: 'fruits',
+        data: {
+            method: "DELETE",
+            path: "fruits/pineapple"
+        }
+    }
+
+    const body = {
+        method: 'POST',
+        body: JSON.stringify(payload),
+        headers: headers
+    }
+
+    fetch("http:\/\/localhost:8080/handle", body)
+        .then((response) => response.json())
+        .then((data) => {
+            sent.innerHTML = JSON.stringify(payload, undefined, 4);
+            received.innerHTML = JSON.stringify(data, undefined, 4);
+            if (data.error) {
+                console.log(data.message);
+            } else {
+                output.innerHTML += `<br><strong>Response from broker service</strong>: ${data.message}`;
+            }
+        })
+        .catch((error) => {
+            output.innerHTML += "<br><br>Error: " + error;
+        })
 })
 </script>
 {{end}}
